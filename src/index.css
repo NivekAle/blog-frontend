@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.container {
+	margin-right: auto;
+	margin-left : auto;
+}
