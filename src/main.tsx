@@ -4,6 +4,8 @@ import App from './App.tsx'
 import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import LoginPage from './pages/login/login.tsx'
+import NewArticlePage from './pages/newArticle/newArticle.tsx'
+import AuthorPage from './pages/author/author.tsx'
 
 const routes = createBrowserRouter([
 	{
@@ -18,6 +20,16 @@ const routes = createBrowserRouter([
 	{
 		path: "/register",
 		element: <LoginPage />
+	},
+	{
+		path: "/author",
+		element: <AuthorPage />,
+		children: [
+			{
+				path: "new-article",
+				element: <NewArticlePage />
+			}
+		]
 	},
 
 ]);

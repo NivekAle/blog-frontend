@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 export default function HeaderComponent() {
+
 	return (
 		<header className='h-[10vh] mb-6'>
 			<div className="container h-full">
