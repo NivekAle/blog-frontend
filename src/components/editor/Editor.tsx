@@ -1,60 +1,106 @@
-import { LexicalComposer } from '@lexical/react/LexicalComposer';
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
-import { ContentEditable } from '@lexical/react/LexicalContentEditable';
-import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
+import { useRef, useState } from "react";
+import JoditEditor from "jodit-react";
+import { Col, Row } from "antd";
+import { ArticleProps } from "../../pages/newArticle/newArticle";
 
-
-type LexicalEditorProps = {
-	config: Parameters<typeof LexicalComposer>['0']['initialConfig'];
+type EditorProps = {
+	chooseArticle: (article: ArticleProps) => any;
 };
 
-export function LexicalEditor(props: LexicalEditorProps) {
-	return (
-		<LexicalComposer initialConfig={props.config}>
-			<RichTextPlugin
-				contentEditable={<ContentEditable />}
-				placeholder={<Placeholder />}
-				ErrorBoundary={LexicalErrorBoundary}
-			/>
-		</LexicalComposer>
-	);
-}
+export default function Editor({ chooseArticle }: EditorProps) {
 
-const Placeholder = () => {
-	return (
-		<div className="absolute top-[1.125rem] left-[1.125rem] opacity-50">
-			Start writing...
-		</div>
-	);
-};
+	const editor = useRef(null);
+	const [content, setContent] = useState<string | null>("");
+	const [title, setTitle] = useState<string | null>("");
 
-export function Editor() {
+	/* Save te content */
+	const handleSaveArticle = () => {
+		chooseArticle({
+			content: content,
+			title: title,
+		})
+	}
+	/* End to: Save te content */
+
+	const config = {
+		readonly: false,
+		height: 330,
+		uploader: {
+			url: "../../../public/uploads/",
+			format: "json",
+			method: "POST",
+			filesVariableName: "files",
+		},
+		imageeditor: {
+			closeAfterSave: true,
+			crop: false,
+			resize: true,
+			width: 500
+		},
+		disableResize: false,
+
+	};
+
+	const handleUpdateContent = (event) => {
+		const editorContent = event.target.value;
+		setContent(editorContent);
+		handleSaveArticle();
+	};
+
+	const handleUpdateTitle = (event) => {
+		setTitle(event.target.value);
+		handleSaveArticle();
+	};
+
 	return (
-		<div
-			id="editor-wrapper"
-			className={
-				'relative prose prose-slate prose-p:my-0 prose-headings:mb-4 prose-headings:mt-2'
-			}
-		>
-			<LexicalEditor
-				config={{
-					namespace: 'lexical-editor',
-					theme: {
-						root: 'p-4 rounded h-full min-h-[200px] bg-slate-50 focus:outline-none focus-visible:border-slate-300',
-						link: 'cursor-pointer',
-						text: {
-							bold: 'font-semibold',
-							underline: 'underline',
-							italic: 'italic',
-							strikethrough: 'line-through',
-							underlineStrikethrough: 'underlined-line-through',
-						},
-					},
-					onError: error => {
-						console.log(error);
-					},
-				}}
-			/>
+		<div>
+			<Row>
+				<Col span={14}>
+					<div className='my-3'>
+						<input
+							type="text"
+							name="email"
+							placeholder="Seu título aqui."
+							className="
+						bg-transparent
+						border-gray-300
+						border-solid
+						border-[.5px]
+						text-gray-900
+						rounded-lg
+						focus:outline-dashed
+						focus:outline-[2px]
+						focus:outline-gray-300
+						focus:border-transparent
+						block
+						w-full
+						py-4
+						px-5
+						text-xl
+						font-semibold
+						"
+							onChange={handleUpdateTitle}
+						/>
+					</div>
+					<JoditEditor
+						ref={editor}
+						value={content}
+						config={config}
+						onBlur={(newContent) => handleUpdateContent(newContent)}
+
+					/>
+				</Col>
+				<Col span={8}>
+					<div className="p-7">
+						<h2 className="text-2xl mb-4 font-semibold">
+							{
+								title
+							}
+						</h2>
+						<div dangerouslySetInnerHTML={{ __html: content }} />
+					</div>
+				</Col>
+			</Row>
 		</div>
-	);
+	)
 }

@@ -1,14 +1,31 @@
-import React from 'react'
-import { Editor } from '../../components/editor/Editor'
+import React, { useState } from 'react'
+import Editor from '../../components/editor/Editor'
+
+export type ArticleProps = {
+	title: string | null;
+	content: string | null;
+}
 
 export default function NewArticlePage() {
+
+	const [newArticle, setNewArticle] = useState<ArticleProps | null>(null);
+
+	const handleArticleFromChild = (article: ArticleProps) => {
+		console.log("alo, está no pai");
+
+		setNewArticle(article);
+
+		console.log(newArticle);
+
+	};
+
 	return (
 		<div className="my-4">
 			<div className="flex justify-between items-center border-b-[1px] border-solid py-4 mb-4">
 				<div className="">
-					<p className='text-slate-600'>
-						escrevendo por&nbsp;
-						<strong className='font-semibold'>
+					<p className='text-slate-500'>
+						Escrevendo por&nbsp;
+						<strong className='font-semibold text-gray-800'>
 							Kevin Alexandre
 						</strong>
 					</p>
@@ -17,8 +34,8 @@ export default function NewArticlePage() {
 					Publicar
 				</button>
 			</div>
-			<div className="md:w-[50%] md:mx-auto">
-				<Editor />
+			<div className="w-full md:mx-auto">
+				<Editor chooseArticle={handleArticleFromChild} />
 			</div>
 		</div>
 	)
