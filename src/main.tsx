@@ -6,6 +6,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import LoginPage from './pages/login/login.tsx'
 import NewArticlePage from './pages/newArticle/newArticle.tsx'
 import AuthorPage from './pages/author/author.tsx'
+import MyAccountPage from './pages/myAccount/myAccount.tsx'
 
 const routes = createBrowserRouter([
 	{
@@ -28,6 +29,10 @@ const routes = createBrowserRouter([
 			{
 				path: "new-article",
 				element: <NewArticlePage />
+			},
+			{
+				path: "my-account",
+				element: <MyAccountPage />
 			}
 		]
 	},

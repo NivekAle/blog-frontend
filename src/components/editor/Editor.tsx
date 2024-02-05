@@ -1,26 +1,18 @@
 import { useRef, useState } from "react";
 import JoditEditor from "jodit-react";
-import { Col, Row } from "antd";
-import { ArticleProps } from "../../pages/newArticle/newArticle";
+import { Article } from "../../types/article.type";
+import { Jodit } from "jodit";
 
 type EditorProps = {
-	chooseArticle: (article: ArticleProps) => any;
-};
+	dataArticle: (data: Article) => Promise<any>;
+}
 
-export default function Editor({ chooseArticle }: EditorProps) {
+export default function Editor({ dataArticle }: EditorProps) {
 
-	const editor = useRef(null);
-	const [content, setContent] = useState<string | null>("");
-	const [title, setTitle] = useState<string | null>("");
+	const editor = useRef<Jodit>(null);
 
-	/* Save te content */
-	const handleSaveArticle = () => {
-		chooseArticle({
-			content: content,
-			title: title,
-		})
-	}
-	/* End to: Save te content */
+	const [title, setTitle] = useState<string>("");
+	const [content, setContent] = useState<string>("");
 
 	const config = {
 		readonly: false,
@@ -41,27 +33,55 @@ export default function Editor({ chooseArticle }: EditorProps) {
 
 	};
 
-	const handleUpdateContent = (event) => {
-		const editorContent = event.target.value;
-		setContent(editorContent);
-		handleSaveArticle();
+	const handleUpdateContent = () => {
+		const editorContent = editor.current?.value;
+		if (editorContent) {
+			setContent(editorContent);
+		}
 	};
 
-	const handleUpdateTitle = (event) => {
+	const handleUpdateTitle = (event: any) => {
 		setTitle(event.target.value);
-		handleSaveArticle();
 	};
+
+	const handlePublish = async () => {
+
+		const newArticle: Article = {
+			content: content,
+			title: title,
+			published_in: new Date().toISOString().slice(0, 10),
+			authorId: 1,
+		}
+
+		validateFormArticle(newArticle.title, newArticle.content);
+
+		dataArticle(newArticle);
+	}
+
 
 	return (
 		<div>
-			<Row>
-				<Col span={14}>
-					<div className='my-3'>
-						<input
-							type="text"
-							name="email"
-							placeholder="Seu título aqui."
-							className="
+			<div className="flex justify-between items-center py-4 mb-4">
+
+				<p className='text-slate-500'>
+					Escrevendo por&nbsp;
+					<strong className='font-semibold text-gray-800'>
+						Kevin Alexandre
+					</strong>
+				</p>
+
+				<button type='button' onClick={handlePublish} className='block px-6 py-2 bg-roxo-500 rounded-full text-sm font-medium text-white hover:bg-roxo-700 hover:text-white'>
+					Publicar
+				</button>
+
+			</div>
+			<div className="w-full md:mx-auto">
+				<div className='my-3'>
+					<input
+						type="text"
+						name="email"
+						placeholder="Seu título aqui."
+						className="
 						bg-transparent
 						border-gray-300
 						border-solid
@@ -76,31 +96,40 @@ export default function Editor({ chooseArticle }: EditorProps) {
 						w-full
 						py-4
 						px-5
-						text-xl
+						text-lg
 						font-semibold
 						"
-							onChange={handleUpdateTitle}
-						/>
-					</div>
-					<JoditEditor
-						ref={editor}
-						value={content}
-						config={config}
-						onBlur={(newContent) => handleUpdateContent(newContent)}
-
+						onBlur={handleUpdateTitle}
 					/>
-				</Col>
-				<Col span={8}>
-					<div className="p-7">
-						<h2 className="text-2xl mb-4 font-semibold">
-							{
-								title
-							}
-						</h2>
-						<div dangerouslySetInnerHTML={{ __html: content }} />
-					</div>
-				</Col>
-			</Row>
+				</div>
+				<JoditEditor
+					ref={editor}
+					value={content}
+					config={config}
+					onBlur={handleUpdateContent}
+
+				/>
+			</div>
+
 		</div>
 	)
+}
+
+
+function validateFormArticle(title: string, content: string) {
+
+	const inputs = [title, content];
+	let erros = false;
+
+	inputs.forEach((el) => {
+		console.log("aqui");
+		if (el == "") {
+			erros = true;
+		}
+	});
+
+	if (erros) {
+		alert("Preencha os campos corretamente!");
+		throw new Error('Break Script');
+	}
 }

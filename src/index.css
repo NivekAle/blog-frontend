@@ -5,5 +5,10 @@
 
 .container {
 	margin-right: auto;
-	margin-left : auto;
+	margin-left: auto;
+}
+
+a.active {
+	background-color: theme('backgroundColor.roxo.50');
+	color: theme('backgroundColor.roxo.500');
 }

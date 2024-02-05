@@ -1,42 +1,41 @@
-import React, { useState } from 'react'
-import Editor from '../../components/editor/Editor'
-
-export type ArticleProps = {
-	title: string | null;
-	content: string | null;
-}
+import Editor from '../../components/editor/Editor';
+import { Article } from '../../types/article.type';
+import { articleApi } from '../../api/article.api';
+import { useState } from 'react';
+import { Alert } from 'antd';
 
 export default function NewArticlePage() {
+	const [infoAlert, setInfoAlert] = useState<boolean>(false);
+	const [alertMessage, setAlertMessage] = useState<string>('');
+	const [alertType, setAlertType] = useState<"error" | "success" | "info" | "warning">('error');
 
-	const [newArticle, setNewArticle] = useState<ArticleProps | null>(null);
+	const handleRenderInfo = async (data: Article) => {
+		const response: { statusCode: number; message: string } = await articleApi.insert(data);
 
-	const handleArticleFromChild = (article: ArticleProps) => {
-		console.log("alo, está no pai");
+		if (response.statusCode === 400 || response.statusCode === 404) {
+			setAlertMessage(response.message);
+			setAlertType("error");
+		} else {
+			setAlertMessage(response.message);
+			setAlertType("success");
 
-		setNewArticle(article);
-
-		console.log(newArticle);
-
+			// setTimeout(() => {
+			// 	console.log("ativado")
+			// 	window.location.href = "/author/";
+			// }, 1000);
+		}
+		setInfoAlert(true);
 	};
 
 	return (
 		<div className="my-4">
-			<div className="flex justify-between items-center border-b-[1px] border-solid py-4 mb-4">
-				<div className="">
-					<p className='text-slate-500'>
-						Escrevendo por&nbsp;
-						<strong className='font-semibold text-gray-800'>
-							Kevin Alexandre
-						</strong>
-					</p>
+			<Editor dataArticle={handleRenderInfo} />
+			{
+				infoAlert &&
+				<div className="fixed right-4 top-4">
+					<Alert message={alertMessage} type={alertType} />
 				</div>
-				<button type='button' className='block px-6 py-2 bg-roxo-500 rounded-full text-sm font-medium text-white hover:bg-roxo-700 hover:text-white'>
-					Publicar
-				</button>
-			</div>
-			<div className="w-full md:mx-auto">
-				<Editor chooseArticle={handleArticleFromChild} />
-			</div>
+			}
 		</div>
-	)
+	);
 }
